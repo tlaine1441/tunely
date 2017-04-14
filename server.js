@@ -12,6 +12,8 @@ app.use(express.static(__dirname + '/public'));
  * DATABASE *
  ************/
 
+ var db = require('./models');
+
 /* hard-coded data */
 var albums = [];
 albums.push({
@@ -74,7 +76,9 @@ app.get('/api', function api_index (req, res){
 });
 
 app.get('/api/albums', function album_index(req, res){
-  res.json(albums);
+  db.Album.find({}, function(err, albums) {
+    res.json(albums);
+  });
 })
 
 /**********
