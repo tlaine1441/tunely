@@ -39,12 +39,20 @@ sampleAlbums.push({
 
 $(document).ready(function() {
   console.log('app.js loaded!');
+  //Request album data from api
   $.get( "api/albums", function( albums ) {
       console.log("ajax request albums: " + albums);
       albums.forEach(function(album){
         renderAlbum(album);
      });
    });
+  // adds event listener to form
+  $( "form" ).on( "submit", function( event ) {
+    event.preventDefault();
+    console.log( $( this ).serialize() );
+    $.post( "/api/albums", $( this ).serialize() );
+    $(this).trigger("reset");
+  });
 });
 
 
@@ -96,5 +104,6 @@ function renderAlbum(album) {
 
   // render to the page with jQuery
     $("#albums").append(albumHtml);
-
 }
+
+
