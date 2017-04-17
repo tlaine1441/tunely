@@ -52,6 +52,7 @@ $(document).ready(function() {
           $('#songModal').attr('data-album-id', id).modal('show');
       });
       $('#songModal').on('click', '#saveSong', function(e) {
+        console.log("clicked");
         handleNewSongSubmit(e);
       });
       $(".edit-album").on('click', function(e) {
@@ -68,7 +69,14 @@ $(document).ready(function() {
         if ($(".save-album").is(':visible')) {
           console.log("visible");
           var id = $(this).parents('.album').data('album-id');
-          saveEdit(id);
+          var inputList = $(this).parentsUntil("div.row.album").find('ul').find("input");
+          var editedAlbum = {
+            name: ($(inputList[0]).val()),
+            artistName: ($(inputList[1]).val()),
+            releaseDate: ($(inputList[2]).val())
+          }
+          console.log(editedAlbum);
+          saveEdit(id, editedAlbum);
           $(".edit-album").removeClass("hidden");
           $(".save-album").addClass("hidden");
          }
@@ -105,9 +113,11 @@ $(document).ready(function() {
     console.log( $( this ).serialize() );
     $.post( "/api/albums", $( this ).serialize() )
       .done(function() {
-        window.location.reload();
-
-      });;
+        $.get( "/api/albums", function( albums ) {
+            console.log("ajax request albums: " + albums);
+              renderAlbum(albums[albums.length-1]);
+          });
+      });
       $(this).trigger("reset");
     });
 });
@@ -160,36 +170,37 @@ function handleEdit(spanList) {
   //$(liList[0].chi).replaceWith('<input id="textinput" name="artistName" type="text" placeholder="" class="form-control input-md">');
   spanList.each(function(i, span){
     if(i < spanList.length-1) {
-      $(span).replaceWith("<span><input id='textinput' name='artistName'' type='text' placeholder='" + span.innerHTML +"' class='form-control input-md'></span>");
+      $(span).replaceWith("<span><input id='textinput' name='artistName'' type='text' value='" + span.innerHTML +"' class='form-control input-md'></span>");
     }
-
   });
-  //$(spanList[0]).replaceWith("<span><input id='textinput' name='artistName'' type='text' placeholder='" + spanList[0].innerHTML +"' class='form-control input-md'></span>");
 }
 
-function saveEdit(id) {
-  $.post("/api/albums/"+id, function( album ) {
+function saveEdit(id, editedAlbum) {
+
+  $.post("/api/albums/"+id, editedAlbum, function( album ) {
     console.log("post return" + album);
+  }).done(function(){
+
   });
-  // $.get( "/api/albums/"+id, function( album ) {
-  //     console.log("ajax request album: " + album.name);
-  //      $('div[data-album-id='+ id +']').find('ul').children().remove();
-  //          var newUl = 
-  //             "<li class='list-group-item'>" +
-  //             "<h4 class='inline-header'>Album Name:</h4>" +
-  //             "<span class='album-name'>" + album.name + "</span>" +
-  //             "</li>" +
-  //             "<li class='list-group-item'>" +
-  //             "<h4 class='inline-header'>Artist Name:</h4>" +
-  //             "<span class='artist-name'>" +  album.artistName + "</span>" +
-  //             "</li>" +
-  //             "<li class='list-group-item'>" +
-  //             "<h4 class='inline-header'>Released date:</h4>" +
-  //             "<span class='album-releaseDate'>" + album.releaseDate + "</span>" +
-  //             "</li>" +
-  //             buildSongsHtml(album.songs);
-  //       $('div[data-album-id='+ id +']').find('ul').append(newUl); 
-  // });
+  $.get( "/api/albums/"+id, function( album ) {
+      console.log("ajax request album: " + album.name);
+       $('div[data-album-id='+ id +']').find('ul').children().remove();
+           var newUl = 
+              "<li class='list-group-item'>" +
+              "<h4 class='inline-header'>Album Name:</h4>" +
+              "<span class='album-name'>" + album.name + "</span>" +
+              "</li>" +
+              "<li class='list-group-item'>" +
+              "<h4 class='inline-header'>Artist Name:</h4>" +
+              "<span class='artist-name'>" +  album.artistName + "</span>" +
+              "</li>" +
+              "<li class='list-group-item'>" +
+              "<h4 class='inline-header'>Released date:</h4>" +
+              "<span class='album-releaseDate'>" + album.releaseDate + "</span>" +
+              "</li>" +
+              buildSongsHtml(album.songs);
+        $('div[data-album-id='+ id +']').find('ul').append(newUl); 
+  });
 }
 
 
@@ -252,6 +263,7 @@ function renderAlbum(album) {
 
   // render to the page with jQuery
     $("#albums").append(albumHtml);
+    return albumHtml;
 }
 
 
