@@ -57,14 +57,19 @@ $(document).ready(function() {
       $(".edit-album").on('click', function(e) {
         //console.log($(this).parentsUntil("div.row.album").find('ul').find("span"));
         var spanList = $(this).parentsUntil("div.row.album").find('ul').find("span");
+        if ($(".edit-album").is(':visible')) {
+          console.log("visible");
+          $(".edit-album").addClass("hidden");
+          $(".save-album").removeClass("hidden");
+         }
         handleEdit(spanList);
-
-      //   //handleEdit($(this));
-      //   var parent = $(this).parents()[2];
-      //   var sibling = $(parent).siblings();
-      //   var ul = $(sibling).find("ul");
-      //   var liList = ul.children();
-      //   handleEdit(liList);
+       });
+      $(".save-album").on('click', function(e) {
+        if ($(".save-album").is(':visible')) {
+          console.log("visible");
+          $(".edit-album").removeClass("hidden");
+          $(".save-album").addClass("hidden");
+         }
        });
      $( ".delete-album" ).click(function(e) {
         e.preventDefault();
@@ -205,6 +210,7 @@ function renderAlbum(album) {
                   "</div>" + 
                   "<div class='col-md-8'>" +
                   "<button class='btn btn-info edit-album'>Edit Album</button>" + 
+                  "<button class='btn btn-info save-album hidden'>Save Album</button>" + 
                   "</div>" +
                   "<div class='col-md-2'>" +
                   "<button name='delete-btn' class='btn btn-danger delete-album pull-right'>Delete</button>" + 
