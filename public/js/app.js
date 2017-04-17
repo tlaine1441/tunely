@@ -40,19 +40,45 @@ sampleAlbums.push({
 $(document).ready(function() {
   console.log('app.js loaded!');
   //Request album data from api
-  $.get( "api/albums", function( albums ) {
+  $.get( "/api/albums", function( albums ) {
       console.log("ajax request albums: " + albums);
       albums.forEach(function(album){
         renderAlbum(album);
+     });
+     $( ".delete-album" ).click(function() {
+        // console.log($(this).closest('div[data-album-id]').data("album-id"));
+        var album_id = JSON.stringify($(this).closest('div[data-album-id]').data("album-id"));
+        console.log(album_id);
+       $.ajax({
+           url: '/api/albums',
+           type: 'DELETE',
+           dataType: "json",
+           data: {
+             album_id: album_id
+           },
+           success: function(data, status) {
+               // Do something with the result
+               console.log("success deleted");
+               //window.location.reload();
+           },
+           error: function(error) {
+            console.log(error);
+            alert("Successfully Deleted!");
+            window.location.reload();
+           }
+       });
      });
    });
   // adds event listener to form
   $( "form" ).on( "submit", function( event ) {
     event.preventDefault();
     console.log( $( this ).serialize() );
-    $.post( "/api/albums", $( this ).serialize() );
-    $(this).trigger("reset");
-  });
+    $.post( "/api/albums", $( this ).serialize() )
+      .done(function() {
+        window.location.reload();
+      });;
+      $(this).trigger("reset");
+    });
 });
 
 
@@ -65,7 +91,7 @@ function renderAlbum(album) {
 
   var albumHtml =
   "        <!-- one album -->" +
-  "        <div class='row album' data-album-id='" + album.id + "'>" +
+  "        <div class='row album' data-album-id='" + album._id + "'>" +
   "          <div class='col-md-10 col-md-offset-1'>" +
   "            <div class='panel panel-default'>" +
   "              <div class='panel-body'>" +
@@ -96,6 +122,7 @@ function renderAlbum(album) {
   "              </div>" + // end of panel-body
 
   "              <div class='panel-footer'>" +
+                  "<button name='delete-btn' class='btn btn-danger delete-album'>Delete</button>"
   "              </div>" +
 
   "            </div>" +

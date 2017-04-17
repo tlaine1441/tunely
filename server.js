@@ -90,9 +90,20 @@ app.post('/api/albums', function album_create(req, res){
   console.log(body.genres.split(', '));
   body.genres = body.genres.split(', ');
   console.log(body);
-  db.Album.create(body, function(error, album) {
+  db.Album.create(body, function(err, album) {
     console.log(album)
+    if(err) response.json({message: 'Could not album because:' + error});
+    res.status(200).send();
   });
+});
+
+app.delete('/api/albums', function album_create(req, res){
+  var _id = JSON.parse(req.body.album_id);
+  console.log(_id);
+ db.Album.findOneAndRemove({_id: _id }, function(err, album) {
+  if(err) response.json({message: 'Could not album because:' + error});
+  res.status(200).send("wooo");
+ });
 });
 
 /**********
