@@ -54,6 +54,18 @@ $(document).ready(function() {
       $('#songModal').on('click', '#saveSong', function(e) {
         handleNewSongSubmit(e);
       });
+      $(".edit-album").on('click', function(e) {
+        //console.log($(this).parentsUntil("div.row.album").find('ul').find("span"));
+        var spanList = $(this).parentsUntil("div.row.album").find('ul').find("span");
+        handleEdit(spanList);
+
+      //   //handleEdit($(this));
+      //   var parent = $(this).parents()[2];
+      //   var sibling = $(parent).siblings();
+      //   var ul = $(sibling).find("ul");
+      //   var liList = ul.children();
+      //   handleEdit(liList);
+       });
      $( ".delete-album" ).click(function(e) {
         e.preventDefault();
         // console.log($(this).closest('div[data-album-id]').data("album-id"));
@@ -136,6 +148,18 @@ function handleNewSongSubmit(e) {
   });
 }
 
+function handleEdit(spanList) {
+  //console.log($(liList[0]));
+  //$(liList[0].chi).replaceWith('<input id="textinput" name="artistName" type="text" placeholder="" class="form-control input-md">');
+  spanList.each(function(i, span){
+    if(i < spanList.length-1) {
+      $(span).replaceWith("<span><input id='textinput' name='artistName'' type='text' placeholder='" + span.innerHTML +"' class='form-control input-md'></span>");
+    }
+
+  });
+  //$(spanList[0]).replaceWith("<span><input id='textinput' name='artistName'' type='text' placeholder='" + spanList[0].innerHTML +"' class='form-control input-md'></span>");
+}
+
 
 // this function takes a single album and renders it to the page
 function renderAlbum(album) {
@@ -153,7 +177,7 @@ function renderAlbum(album) {
   "                     <img src='" + "http://placehold.it/400x400'" +  " alt='album image'>" +
   "                  </div>" +
   "                  <div class='col-md-9 col-xs-12'>" +
-  "                    <ul class='list-group'>" +
+  "                    <ul class='list-group album-group'>" +
   "                      <li class='list-group-item'>" +
   "                        <h4 class='inline-header'>Album Name:</h4>" +
   "                        <span class='album-name'>" + album.name + "</span>" +
@@ -179,8 +203,11 @@ function renderAlbum(album) {
                   "<div class='col-md-2'>" +
                   "<button class='btn btn-primary add-song'>Add Song</button>" +
                   "</div>" + 
+                  "<div class='col-md-8'>" +
+                  "<button class='btn btn-info edit-album'>Edit Album</button>" + 
+                  "</div>" +
                   "<div class='col-md-2'>" +
-                  "<button name='delete-btn' class='btn btn-danger delete-album'>Delete</button>" + 
+                  "<button name='delete-btn' class='btn btn-danger delete-album pull-right'>Delete</button>" + 
                   "</div>" +
                   "</div>" +
   "              </div>" +
