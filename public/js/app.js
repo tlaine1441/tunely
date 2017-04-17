@@ -45,7 +45,17 @@ $(document).ready(function() {
       albums.forEach(function(album){
         renderAlbum(album);
      });
-     $( ".delete-album" ).click(function() {
+      $('#albums').on('click', '.add-song', function(e) {
+          console.log('asdfasdfasdf');
+          var id= $(this).parents('.album').data('album-id'); // "5665ff1678209c64e51b4e7b"
+          console.log('id',id);
+          $('#songModal').attr('data-album-id', id).modal('show');
+      });
+      $('#songModal').on('click', '#saveSong', function(e) {
+        handleNewSongSubmit(e);
+      });
+     $( ".delete-album" ).click(function(e) {
+        e.preventDefault();
         // console.log($(this).closest('div[data-album-id]').data("album-id"));
         var album_id = JSON.stringify($(this).closest('div[data-album-id]').data("album-id"));
         console.log(album_id);
@@ -56,15 +66,16 @@ $(document).ready(function() {
            data: {
              album_id: album_id
            },
-           success: function(data, status) {
+           success: function(status) {
                // Do something with the result
                console.log("success deleted");
                //window.location.reload();
+               $("div[data-album-id=" + album_id + "]").remove();
+               $('#deleteModal').modal('show');
            },
            error: function(error) {
             console.log(error);
-            alert("Successfully Deleted!");
-            window.location.reload();
+            //window.location.reload();
            }
        });
      });
@@ -76,13 +87,54 @@ $(document).ready(function() {
     $.post( "/api/albums", $( this ).serialize() )
       .done(function() {
         window.location.reload();
+
       });;
       $(this).trigger("reset");
     });
 });
 
+function buildSongsHtml(songs) {
+  //console.log(songs);
+  var songText = "  – "; 
+  songs.forEach(function(song) { 
+    songText = songText + "(" + song.trackNumber + ") " + song.name + " – "; }); 
+  var songsHtml = "<li class='list-group-item'><h4 class='inline-header'>Songs:</h4><span>" + songText + "</span> </li>";
+  return songsHtml;
+}
 
-
+function handleNewSongSubmit(e) {
+  e.preventDefault();
+  // get data from modal fields
+  console.log($("#songName").val());
+  console.log($("#trackNumber").val()); 
+  var newSong= {
+    name: $("#songName").val(),
+    trackNumber: $("#trackNumber").val()
+  }
+  console.log(newSong);
+  console.log("modal " + $("#songModal").attr('data-album-id'));
+  var albumId = $("#songModal").attr('data-album-id');
+  var URL = albumId + "/songs";
+  console.log(URL);
+  // POST to SERVER
+  $.post( ("/api/albums/" + URL), newSong)
+  .done(function(e){
+    // clear form
+    $("#songName").val("");
+    $("#trackNumber").val("");
+    // close modal
+    $('#songModal').modal('hide');
+    // update the correct album to show the new song
+    $.get( ("/api/albums/" + albumId), function( album ) {
+        console.log("ajax request album by id: " + album);
+        console.log($("div[data-album-id=" + albumId + "]").find("ul").children()[3]);
+        $("div[data-album-id=" + albumId + "]").find("ul").children()[3].remove();
+        var newSongs = buildSongsHtml(album.songs);
+        console.log(newSongs);
+        $("div[data-album-id=" + albumId + "]").find("ul").append(newSongs);
+    });
+  });
+}
 
 
 // this function takes a single album and renders it to the page
@@ -114,6 +166,7 @@ function renderAlbum(album) {
   "                        <h4 class='inline-header'>Released date:</h4>" +
   "                        <span class='album-releaseDate'>" + album.releaseDate + "</span>" +
   "                      </li>" +
+                          buildSongsHtml(album.songs) +
   "                    </ul>" +
   "                  </div>" +
   "                </div>" +
@@ -122,7 +175,14 @@ function renderAlbum(album) {
   "              </div>" + // end of panel-body
 
   "              <div class='panel-footer'>" +
-                  "<button name='delete-btn' class='btn btn-danger delete-album'>Delete</button>"
+                  "<div class='row'>" +
+                  "<div class='col-md-2'>" +
+                  "<button class='btn btn-primary add-song'>Add Song</button>" +
+                  "</div>" + 
+                  "<div class='col-md-2'>" +
+                  "<button name='delete-btn' class='btn btn-danger delete-album'>Delete</button>" + 
+                  "</div>" +
+                  "</div>" +
   "              </div>" +
 
   "            </div>" +

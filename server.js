@@ -79,9 +79,33 @@ app.get('/api', function api_index (req, res){
   });
 });
 
+app.get('/api/albums/:id', function album_index(req, res){
+  console.log(req.params.id);
+  db.Album.findOne({_id: req.params.id}, function(err, album) {
+    res.json(album);
+  });
+});
+
 app.get('/api/albums', function album_index(req, res){
   db.Album.find({}, function(err, albums) {
     res.json(albums);
+  });
+});
+
+app.post('/api/albums/:album_id/songs', function song_create(req, res){
+  var body = req.body;
+  //console.log(body);
+  db.Album.findOne({_id: req.params.album_id}, function(err, album) {
+    //console.log(album.songs);
+    if(err) res.json({message: 'Could not album because:' + error});
+    album.songs.push(body);
+    res.status(200).send();
+    album.save(function (err) {
+        if(err) {
+            console.error('ERROR!');
+        }
+
+    });
   });
 });
 
@@ -92,18 +116,22 @@ app.post('/api/albums', function album_create(req, res){
   console.log(body);
   db.Album.create(body, function(err, album) {
     console.log(album)
-    if(err) response.json({message: 'Could not album because:' + error});
+    if(err) res.json({message: 'Could not album because:' + error});
     res.status(200).send();
   });
 });
+
 
 app.delete('/api/albums', function album_create(req, res){
   var _id = JSON.parse(req.body.album_id);
   console.log(_id);
  db.Album.findOneAndRemove({_id: _id }, function(err, album) {
   if(err) response.json({message: 'Could not album because:' + error});
-  res.status(200).send("wooo");
- });
+    album.save(function(err){
+      if(err) return res.send(err);
+      res.json({status:'done'});
+    });
+  });
 });
 
 /**********
