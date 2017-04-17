@@ -99,12 +99,29 @@ app.post('/api/albums/:album_id/songs', function song_create(req, res){
     //console.log(album.songs);
     if(err) res.json({message: 'Could not album because:' + error});
     album.songs.push(body);
-    res.status(200).send();
+    // res.status(200).send();
     album.save(function (err) {
         if(err) {
             console.error('ERROR!');
         }
 
+    });
+  });
+});
+
+app.post('/api/albums/:id', function song_create(req, res){
+  var body = req.body;
+  //console.log(body);
+  db.Album.findOneAndUpdate({_id: req.params.id}, {$set: {albumName: body.albumName, name: body.name, releaseDate: body.releaseDate }}, function(err, album) {
+    console.log(album);
+    if(err) res.json({message: 'Could not album because:' + error});
+    // album.songs.push(body);
+    // res.status(200).send();
+    album.save(function (err) {
+      if(err) {
+            console.error('ERROR!');
+        }
+        res.status(200).send();
     });
   });
 });

@@ -67,6 +67,8 @@ $(document).ready(function() {
       $(".save-album").on('click', function(e) {
         if ($(".save-album").is(':visible')) {
           console.log("visible");
+          var id = $(this).parents('.album').data('album-id');
+          saveEdit(id);
           $(".edit-album").removeClass("hidden");
           $(".save-album").addClass("hidden");
          }
@@ -164,6 +166,32 @@ function handleEdit(spanList) {
   });
   //$(spanList[0]).replaceWith("<span><input id='textinput' name='artistName'' type='text' placeholder='" + spanList[0].innerHTML +"' class='form-control input-md'></span>");
 }
+
+function saveEdit(id) {
+  $.post("/api/albums/"+id, function( album ) {
+    console.log("post return" + album);
+  });
+  // $.get( "/api/albums/"+id, function( album ) {
+  //     console.log("ajax request album: " + album.name);
+  //      $('div[data-album-id='+ id +']').find('ul').children().remove();
+  //          var newUl = 
+  //             "<li class='list-group-item'>" +
+  //             "<h4 class='inline-header'>Album Name:</h4>" +
+  //             "<span class='album-name'>" + album.name + "</span>" +
+  //             "</li>" +
+  //             "<li class='list-group-item'>" +
+  //             "<h4 class='inline-header'>Artist Name:</h4>" +
+  //             "<span class='artist-name'>" +  album.artistName + "</span>" +
+  //             "</li>" +
+  //             "<li class='list-group-item'>" +
+  //             "<h4 class='inline-header'>Released date:</h4>" +
+  //             "<span class='album-releaseDate'>" + album.releaseDate + "</span>" +
+  //             "</li>" +
+  //             buildSongsHtml(album.songs);
+  //       $('div[data-album-id='+ id +']').find('ul').append(newUl); 
+  // });
+}
+
 
 
 // this function takes a single album and renders it to the page
